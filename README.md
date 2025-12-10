@@ -25,18 +25,18 @@ LiangHuaFenXi 是一个结合了**传统技术分析**、**量化策略**和**�
 ```mermaid
 graph TD
     User[用户] --> Dashboard[Streamlit Dashboard]
-    Dashboard --> AI_Anal[AI分析器 (Groq)]
+    Dashboard --> AI_Anal["AI分析器 (Groq)"]
     Dashboard --> Strat_Eng[策略引擎]
     
     Strat_Eng --> Tech_Score[技术评分]
-    Strat_Eng --> Pattern[分时/K线形态]
-    Strat_Eng --> Limit[打板/连板策略]
+    Strat_Eng --> Pattern["分时/K线形态"]
+    Strat_Eng --> Limit["打板/连板策略"]
     Strat_Eng --> Sentiment[市场情绪监控]
     
     Dashboard --> Data_Svc[数据服务]
-    Data_Svc --> DB[(MySQL 数据库)]
-    Data_Svc --> AkShare[AkShare API]
-    Data_Svc --> ITick[iTick API]
+    Data_Svc --> DB[("MySQL 数据库")]
+    Data_Svc --> AkShare["AkShare API"]
+    Data_Svc --> ITick["iTick API"]
     Data_Svc --> Sina[新浪实时行情]
 ```
 
