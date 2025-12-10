@@ -1,0 +1,73 @@
+﻿
+==================================================
+分析股票: 000592
+==================================================
+
+[市场情绪]
+请求失败(重试3次): HTTPSConnectionPool(host='82.push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m%3A0+t%3A6%2Cm%3A0+t%3A80%2Cm%3A1+t%3A2%2Cm%3A1+t%3A23%2Cm%3A0+t%3A81+s%3A2048&fields=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6%2Cf7%2Cf8%2Cf9%2Cf10%2Cf12%2Cf13%2Cf14%2Cf15%2Cf16%2Cf17%2Cf18%2Cf20%2Cf21%2Cf23%2Cf24%2Cf25%2Cf22%2Cf11%2Cf62%2Cf128%2Cf136%2Cf115%2Cf152 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))
+   情绪评分: 50分 (中性)
+   涨跌家数: 涨0 / 跌0
+   涨停/跌停: 0 / 0
+
+[实时行情]
+   名称: 平潭发展
+   现价: 12.49 (+3.91%)
+   最高/最低: 12.8/12.06
+   成交量: 423万手
+
+[板块联动]
+获取板块信息失败: HTTPSConnectionPool(host='79.push2.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m%3A90+t%3A3+f%3A%2150&fields=f2%2Cf3%2Cf4%2Cf8%2Cf12%2Cf14%2Cf15%2Cf16%2Cf17%2Cf18%2Cf20%2Cf21%2Cf24%2Cf25%2Cf22%2Cf33%2Cf11%2Cf62%2Cf128%2Cf124%2Cf107%2Cf104%2Cf105%2Cf136 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))
+   板块强度: 较弱
+   连板加成: +0%
+
+[分时信号] 3个
+   [hold] 早盘急拉 
+      早盘30分钟内急拉6.5%，注意追高风险 (质量65%)
+   [buy] W底形态 [高质量]
+      W底形态确认，两低点差0.5%，回升2.6% (质量87%)
+   [buy] 量价齐升 
+      量价齐升，量比2.0，强势延续 (质量62%)
+
+[分时建议] BUY (置信度36%)
+   高质量信号数: 3
+
+[历史数据分析]
+[缓存命中] 000592 日K线数据
+   历史趋势: 多头排列，上升趋势
+   支撑/压力: 10.34 / 13.27
+   量比: 0.01
+   MACD: MACD上升
+   RSI: 50.3
+
+[信号聚合]
+   综合决策: BUY (48%)
+   信号分布: 买48 / 卖0 / 持9
+   摘要: 弱买入信号 (信号一致) | 买:48 卖:0 持:9
+
+[AI分析] 正在调用Groq (传入完整数据)...
+   - 分时信号: 3个
+   - 技术指标: 5项
+   - 历史数据: 已计算
+   - 聚合决策: BUY
+
+**核心研判**: 强势短线 (Strong)
+
+**逻辑支撑**:
+1. **技术面依据**: 平潭发展突破上周五的高点，形成W底形态，量价齐升，MACD上行，RSI波动在中性区间，均线位置处于上涨趋势。这些技术信号表明涨势强劲。
+2. **资金面依据**: 实时盘口显示买盘较强，资金净流入（0/0），成交量达到423万手，交易活跃性较强，这些资金面指标表明市场资金支持较强。
+3. **形态依据**: 早盘急拉形成W底形态，今日涨幅达到3.91%，历史趋势多头排列，上升趋势。这些形态依据支持当前的短线强势。
+
+**交易策略**:
+- 开盘策略：竞价高开，准备做多。
+- 盘中策略：监控短线波动，如果下跌，做T时机出现，监控技术指标和资金面进行调整。
+- 尾盘策略：当成交量减弱、买盘变弱、技术指标转弱或者价格接近压力位时，离场。
+
+**仓位建议**: 重仓
+
+**风控点位**:
+- 止损：10.8
+- 止盈：13.2
+
+[数据库存储]
+   分析记录已保存到数据库
+   日K线数据已缓存

@@ -1,0 +1,40 @@
+.env
+__pycache__/
+*.pyc
+
+# IDEs
+.vscode/
+.idea/
+.gemini/
+
+# System
+thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Logs and Data
+logs/
+*.log
+temp/
+tmp/
+unused_code/
+.DS_Store
+
+
+# IDEs
+.vscode/
+.idea/
+.gemini/
+
+# System
+thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Logs and Data
+logs/
+*.log
+temp/
+tmp/
+unused_code/
+
