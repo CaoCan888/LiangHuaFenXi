@@ -298,3 +298,54 @@ class DataCache(Base):
         {'comment': 'API数据缓存表'}
     )
 
+
+class Watchlist(Base):
+    """自选股列表"""
+    __tablename__ = 'watchlist'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    stock_code = Column(String(20), nullable=False, comment='股票代码')
+    stock_name = Column(String(50), comment='股票名称')
+    group_name = Column(String(50), default='默认', comment='分组名称')
+    notes = Column(String(200), comment='备注')
+    sort_order = Column(Integer, default=0, comment='排序顺序')
+    added_price = Column(Float, comment='加入时价格')
+    added_at = Column(DateTime, default=datetime.now, comment='加入时间')
+    
+    __table_args__ = (
+        Index('idx_watchlist_code', 'stock_code'),
+        Index('idx_watchlist_group', 'group_name'),
+        {'comment': '自选股列表'}
+    )
+
+
+class Position(Base):
+    """持仓记录"""
+    __tablename__ = 'positions'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    stock_code = Column(String(20), nullable=False, comment='股票代码')
+    stock_name = Column(String(50), comment='股票名称')
+    
+    # 持仓信息
+    shares = Column(Integer, default=0, comment='持仓数量(股)')
+    avg_cost = Column(Float, comment='持仓成本价')
+    total_cost = Column(Float, comment='总成本')
+    
+    # 交易记录
+    buy_date = Column(Date, comment='首次买入日期')
+    last_trade_date = Column(Date, comment='最后交易日期')
+    
+    # 状态
+    is_active = Column(Boolean, default=True, comment='是否持仓中')
+    strategy_tag = Column(String(50), comment='策略标签 (如: 打板/趋势/底部)')
+    notes = Column(String(500), comment='交易笔记')
+    
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    
+    __table_args__ = (
+        Index('idx_position_code', 'stock_code'),
+        Index('idx_position_active', 'is_active'),
+        {'comment': '持仓记录表'}
+    )

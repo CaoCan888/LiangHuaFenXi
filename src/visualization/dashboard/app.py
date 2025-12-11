@@ -35,6 +35,7 @@ from src.visualization.dashboard.components.tab_limit import render_limit_tab
 from src.visualization.dashboard.components.tab_chan import render_chan_tab
 from src.visualization.dashboard.components.tab_dragon import render_dragon_tab
 from src.visualization.dashboard.components.tab_backtest import render_backtest_tab
+from src.visualization.dashboard.components.tab_portfolio import render_portfolio_panel, render_watchlist_panel, render_win_rate_stats
 
 st.set_page_config(
     page_title="AI股票分析系统", 
@@ -174,9 +175,9 @@ def render_dashboard(df: pd.DataFrame, code: str, strategy: str,
     st.divider()
     
     # 分析标签页
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
         "💰 实时资金", "📊 K线图表", "🎯 技术评分", 
-        "🔥 打板分析", "📐 缠论分析", "🐉 龙虎榜", "📈 回测结果"
+        "🔥 打板分析", "📐 缠论分析", "🐉 龙虎榜", "📈 回测结果", "💼 我的持仓"
     ])
     
     with tab1:
@@ -199,6 +200,14 @@ def render_dashboard(df: pd.DataFrame, code: str, strategy: str,
     
     with tab7:
         render_backtest_tab(df, strategy, initial_capital)
+    
+    with tab8:
+        # 获取股票名称
+        stock_name = code.split('.')[-1]  # 简化处理
+        current_price = latest['close']
+        render_portfolio_panel(code, stock_name, current_price, user_shares, user_cost)
+        render_watchlist_panel()
+        render_win_rate_stats()
     
     # 底部原始数据
     with st.expander("📑 查看原始数据"):

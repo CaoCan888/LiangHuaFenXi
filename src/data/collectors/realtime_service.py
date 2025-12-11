@@ -57,18 +57,31 @@ class RealtimeQuote:
     
     @property
     def is_limit_up(self) -> bool:
-        """是否涨停"""
-        return self.change_pct >= 9.8
+        """是否涨停 (根据板块类型动态判断)"""
+        try:
+            from src.utils.stock_utils import is_limit_up
+            return is_limit_up(self.code, self.name, self.change_pct)
+        except ImportError:
+            # Fallback: 主板10%
+            return self.change_pct >= 9.8
     
     @property
     def is_limit_down(self) -> bool:
-        """是否跌停"""
-        return self.change_pct <= -9.8
+        """是否跌停 (根据板块类型动态判断)"""
+        try:
+            from src.utils.stock_utils import is_limit_down
+            return is_limit_down(self.code, self.name, self.change_pct)
+        except ImportError:
+            return self.change_pct <= -9.8
     
     @property
     def near_limit_up(self) -> bool:
-        """接近涨停（涨幅>7%）"""
-        return self.change_pct >= 7.0
+        """接近涨停 (涨幅达到涨停幅度的70%)"""
+        try:
+            from src.utils.stock_utils import is_near_limit_up
+            return is_near_limit_up(self.code, self.name, self.change_pct)
+        except ImportError:
+            return self.change_pct >= 7.0
     
     def to_dict(self) -> dict:
         """转为字典"""
