@@ -270,11 +270,19 @@ class AnalysisHistory(Base):
     support_level = Column(Float, comment='支撑位')
     resistance_level = Column(Float, comment='压力位')
     
+    # 胜率验证 (P0新增)
+    verified = Column(Boolean, default=False, comment='是否已验证')
+    verified_at = Column(DateTime, comment='验证时间')
+    price_after_5d = Column(Float, comment='5日后价格')
+    actual_return_5d = Column(Float, comment='5日实际收益率%')
+    verdict_correct = Column(Boolean, comment='AI判断是否正确')
+    
     created_at = Column(DateTime, default=datetime.now)
     
     __table_args__ = (
         Index('idx_analysis_stock_date', 'stock_code', 'analysis_date'),
         Index('idx_analysis_time', 'analysis_time'),
+        Index('idx_analysis_verified', 'verified'),
         {'comment': 'AI分析历史记录表'}
     )
 

@@ -46,6 +46,14 @@ class StockContext:
     volume_ratio: float = 1.0    # 量比
     macd_signal: str = ""        # MACD信号 (金叉/死叉)
     rsi_value: float = 50.0      # RSI数值
+    # P1新增: 用户持仓信息
+    user_cost: float = 0.0       # 用户持仓成本
+    user_shares: int = 0         # 用户持仓股数
+    # P2新增: 增强数据
+    bid_volumes: list = field(default_factory=list)   # 买1-5挂单量
+    ask_volumes: list = field(default_factory=list)   # 卖1-5挂单量
+    news_titles: list = field(default_factory=list)   # 近期新闻标题
+    market_regime: str = "中性"   # 市场状态
 
 
 class AIAnalyzer:
@@ -145,14 +153,51 @@ class AIAnalyzer:
         if ctx.resistance_level > 0:
             level_text += f"\n- 压力位: {ctx.resistance_level:.2f}"
         
-        prompt = f"""你是一位专业的A股短线交易员。请结合【实时盘口】、【技术指标】和【历史趋势】，给出实战操作建议。
+        # 用户持仓信息
+        position_text = ""
+        if ctx.user_cost > 0:
+            pnl_pct = (ctx.price / ctx.user_cost - 1) * 100
+            position_text = f"""
+## 3. 用户持仓
+- 持仓成本: {ctx.user_cost:.2f}
+- 持仓数量: {ctx.user_shares}股
+- 当前盈亏: {pnl_pct:+.2f}%
+- 状态: {'盈利中' if pnl_pct > 0 else '亏损中' if pnl_pct < 0 else '持平'}
+"""
+        
+        # 盘口数据
+        l2_text = ""
+        if ctx.bid_volumes and ctx.ask_volumes:
+            bid_total = sum(ctx.bid_volumes)
+            ask_total = sum(ctx.ask_volumes)
+            ratio = bid_total / ask_total if ask_total > 0 else 1
+            l2_text = f"""
+## 4. 五档盘口
+- 卖盘挂单: {ask_total}手 (卖1-5)
+- 买盘挂单: {bid_total}手 (买1-5)
+- 买卖比: {ratio:.2f} ({'买盘强' if ratio > 1.2 else '卖盘强' if ratio < 0.8 else '均衡'})
+"""
+        
+        # 新闻标题
+        news_text = ""
+        if ctx.news_titles:
+            titles = ctx.news_titles[:3]  # 最多3条
+            news_text = f"""
+## 5. 近期新闻
+{chr(10).join(['- ' + t for t in titles])}
+"""
+        
+        # 市场状态
+        regime_text = f"\n## 6. 市场环境: {ctx.market_regime}" if ctx.market_regime != "中性" else ""
+        
+        prompt = f"""你是一位专业的A股短线交易员。请分析以下数据并给出建议。
 
-**重要提醒**: A股实行T+1交易制度，今天买入的股票最早明天才能卖出！请在建议中充分考虑这一点。
+**重要**: A股实行T+1，今天买入明天才能卖出。
 
 ## 1. 实时盘面
 - 股票: {ctx.name} ({ctx.code})
 - 现价: {ctx.price:.2f} ({ctx.change_pct:+.2f}%)
-- 状态: 最高{ctx.high}/最低{ctx.low}/昨收{ctx.pre_close}
+- 最高/最低/昨收: {ctx.high}/{ctx.low}/{ctx.pre_close}
 - 成交: {(ctx.volume/10000):.0f}万手 / {(ctx.amount/100000000):.1f}亿
 - 资金: {ctx.fund_flow}
 - 压力: {ctx.pressure}
@@ -165,30 +210,75 @@ class AIAnalyzer:
 - 近期趋势: {ctx.recent_trend}
 {hist_text}
 {level_text}
+{position_text}
+{l2_text}
+{news_text}
+{regime_text}
 
-## 请输出分析报告 (严格按此格式):
+## 请严格按以下JSON格式输出 (只输出JSON，不要其他文字):
 
-**核心研判**: [Strong/Weak/Neutral] 一句话定性
+```json
+{{
+  "verdict": "BUY或SELL或HOLD",
+  "confidence": 0到100的整数,
+  "core_logic": "一句话核心判断理由",
+  "today_action": "今日操作建议",
+  "tomorrow_predict": "明日走势预判",
+  "stop_loss": 止损价格数字,
+  "take_profit": 止盈价格数字,
+  "position_size": "轻仓30%或半仓50%或重仓70%",
+  "risk_warning": "主要风险提示"
+}}
+```
 
-**逻辑支撑**:
-1. [技术面依据]
-2. [资金面依据]
-3. [形态依据]
-
-**交易策略** (T+1):
-- 今日操作: [是否适合今天买入？买入时机？]
-- 明日预判: [预计明日开盘走势，建议何时卖出]
-- 持仓建议: [如已持仓，今天应如何操作]
-
-**仓位建议**: [轻仓XX%/半仓/重仓]
-
-**风控点位**: 
-- 止损: XX.XX (明日若低于此价立即卖出)
-- 止盈: XX.XX (明日达到此价可考虑卖出)
-
-要求：站在短线交易员角度，充分考虑T+1限制，给出可执行的操作建议，中文回答，280字以内。"""
+要求：verdict必须是BUY/SELL/HOLD之一，stop_loss和take_profit必须是具体数字。"""
         
         return prompt
+    
+    def parse_ai_response(self, response: str) -> dict:
+        """解析AI的JSON响应"""
+        import json
+        import re
+        
+        try:
+            return json.loads(response)
+        except json.JSONDecodeError:
+            pass
+        
+        # 尝试提取JSON块
+        json_match = re.search(r'```json\s*(.*?)\s*```', response, re.DOTALL)
+        if json_match:
+            try:
+                return json.loads(json_match.group(1))
+            except json.JSONDecodeError:
+                pass
+        
+        # 尝试找到 { 开头的JSON
+        json_match = re.search(r'\{.*\}', response, re.DOTALL)
+        if json_match:
+            try:
+                return json.loads(json_match.group(0))
+            except json.JSONDecodeError:
+                pass
+        
+        # 解析失败，返回默认结构
+        return {
+            "verdict": "HOLD",
+            "confidence": 50,
+            "core_logic": "AI响应解析失败",
+            "today_action": response[:100] if response else "无数据",
+            "tomorrow_predict": "无法预测",
+            "stop_loss": 0,
+            "take_profit": 0,
+            "position_size": "观望",
+            "risk_warning": "AI响应格式异常",
+            "_raw_response": response
+        }
+    
+    def analyze_structured(self, context: StockContext) -> dict:
+        """结构化分析 - 返回解析后的dict"""
+        raw_response = self.analyze(context)
+        return self.parse_ai_response(raw_response)
 
 
 # 全局实例
